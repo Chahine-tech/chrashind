@@ -7,6 +7,7 @@ import (
 
 	"github.com/Chahine-tech/chrashind/prisma/db"
 	"github.com/Chahine-tech/chrashind/utils/services/bcrypt"
+	"github.com/Chahine-tech/chrashind/utils/services/prisma"
 )
 
 type User struct {
@@ -15,29 +16,28 @@ type User struct {
 	Password string `json:"password"`
 }
 
-func (user *User) Create(client *db.PrismaClient, ctx context.Context) {
+func (user *User) Create(ctx context.Context) {
+	client := prisma.PrismaClient()
+	log.Print(client, "connect ?????")
 	createdUser, err := client.Users.CreateOne(
 		db.Users.Username.Set(user.Username),
 		db.Users.Password.Set(user.Password),
 	).Exec(ctx)
+	log.Print(createdUser, "connect ?????")
+	log.Print(err, "????")
 	if err != nil {
-		// Handle the error appropriately
 		return
 	}
-
 	hashedPassword, err := bcrypt.HashPassword(user.Password)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// Update the created user with the hashed password
 	_, err = client.Users.FindUnique(
 		db.Users.ID.Equals(createdUser.ID),
 	).Update(
 		db.Users.Password.Set(hashedPassword),
 	).Exec(ctx)
 	if err != nil {
-		// Handle the error appropriately
 		log.Fatal(err)
 	}
 }

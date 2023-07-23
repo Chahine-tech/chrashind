@@ -1,19 +1,19 @@
 package prisma
 
-import "github.com/Chahine-tech/chrashind/prisma/db"
+import (
+	"github.com/Chahine-tech/chrashind/prisma/db"
+)
 
-// func EnableConnect() error {
-// 	client := db.NewClient()
-// 	if err := client.Prisma.Connect(); err != nil {
-// 		return err
-// 	}
+func PrismaClient() *db.PrismaClient {
+	client := db.NewClient()
+	if err := client.Prisma.Connect(); err != nil {
+		panic(err)
+	}
 
-// 	defer func() {
-// 		if err := client.Prisma.Disconnect(); err != nil {
-// 			panic(err)
-// 		}
-// 	}()
-// 	return nil
-// }
-
-var Connect = db.NewClient().Prisma.Connect()
+	defer func() {
+		if err := client.Prisma.Disconnect(); err != nil {
+			panic(err)
+		}
+	}()
+	return client
+}

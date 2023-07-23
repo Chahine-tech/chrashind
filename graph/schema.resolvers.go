@@ -7,7 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
-	"strconv"
+	"log"
 
 	"github.com/Chahine-tech/chrashind/graph/model"
 	"github.com/Chahine-tech/chrashind/internal/links"
@@ -18,16 +18,17 @@ import (
 
 // CreateLink is the resolver for the createLink field.
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
-	var link links.Link
-	link.Title = input.Title
-	link.Address = input.Address
-	linkID, err := link.Save()
-	if err != nil {
-		// Handle the error returned from Save function
-		return nil, err
-	}
+	// var link links.Link
+	// link.Title = input.Title
+	// link.Address = input.Address
+	// linkID, err := link.Save()
+	// if err != nil {
+	// 	// Handle the error returned from Save function
+	// 	return nil, err
+	// }
 
-	return &model.Link{ID: strconv.FormatInt(linkID, 10), Title: link.Title, Address: link.Address}, nil
+	// return &model.Link{ID: strconv.FormatInt(linkID, 10), Title: link.Title, Address: link.Address}, nil
+	panic(fmt.Errorf("not implemented: Login - login"))
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -35,7 +36,8 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 	var user users.User
 	user.Username = input.Username
 	user.Password = input.Password
-	user.Create(&db.PrismaClient{}, ctx)
+	user.Create(ctx)
+	log.Print("user created", user)
 	token, err := jwt.GenerateToken(user.Username)
 	if err != nil {
 		return "", err
