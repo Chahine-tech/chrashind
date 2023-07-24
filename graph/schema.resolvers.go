@@ -12,7 +12,6 @@ import (
 	"github.com/Chahine-tech/chrashind/graph/model"
 	"github.com/Chahine-tech/chrashind/internal/links"
 	"github.com/Chahine-tech/chrashind/internal/users"
-	"github.com/Chahine-tech/chrashind/prisma/db"
 	"github.com/Chahine-tech/chrashind/utils/services/jwt"
 )
 
@@ -58,7 +57,7 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 // Links is the resolver for the links field.
 func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
 	var resultLinks []*model.Link
-	dbLinks, err := links.GetAll(&db.PrismaClient{}, ctx)
+	dbLinks, err := links.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}

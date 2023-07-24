@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/Chahine-tech/chrashind/internal/users"
-	"github.com/Chahine-tech/chrashind/prisma/db"
 	"github.com/Chahine-tech/chrashind/utils/services/jwt"
 )
 
@@ -16,7 +15,7 @@ type contextKey struct {
 	name string
 }
 
-func Middleware(client *db.PrismaClient, ctx context.Context) func(http.Handler) http.Handler {
+func Middleware(ctx context.Context) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")
@@ -37,7 +36,7 @@ func Middleware(client *db.PrismaClient, ctx context.Context) func(http.Handler)
 
 			// create user and check if user exists in db
 			user := users.User{Username: username}
-			id, err := users.GetUserIdByUsername(username, client, ctx)
+			id, err := users.GetUserIdByUsername(username, ctx)
 			if err != nil {
 				next.ServeHTTP(w, r)
 				return

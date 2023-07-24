@@ -8,7 +8,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/Chahine-tech/chrashind/graph"
-	"github.com/Chahine-tech/chrashind/prisma/db"
 )
 
 const defaultPort = "8080"
@@ -18,9 +17,6 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
-	if err := initConfig(); err != nil {
-		log.Fatal(err)
-	}
 	// http.use(middleware)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
@@ -29,18 +25,4 @@ func main() {
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
-}
-
-func initConfig() error {
-	client := db.NewClient()
-	if err := client.Prisma.Connect(); err != nil {
-		return err
-	}
-
-	defer func() {
-		if err := client.Prisma.Disconnect(); err != nil {
-			panic(err)
-		}
-	}()
-	return nil
 }

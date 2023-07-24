@@ -18,13 +18,10 @@ type User struct {
 
 func (user *User) Create(ctx context.Context) {
 	client := prisma.PrismaClient()
-	log.Print(client, "connect ?????")
 	createdUser, err := client.Users.CreateOne(
 		db.Users.Username.Set(user.Username),
 		db.Users.Password.Set(user.Password),
 	).Exec(ctx)
-	log.Print(createdUser, "connect ?????")
-	log.Print(err, "????")
 	if err != nil {
 		return
 	}
@@ -42,7 +39,8 @@ func (user *User) Create(ctx context.Context) {
 	}
 }
 
-func GetUserIdByUsername(username string, client *db.PrismaClient, ctx context.Context) (int, error) {
+func GetUserIdByUsername(username string, ctx context.Context) (int, error) {
+	client := prisma.PrismaClient()
 	user, err := client.Users.FindUnique(db.Users.ID.Equals(username)).Exec(ctx)
 	if err != nil {
 		// Handle the error appropriately

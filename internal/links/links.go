@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Chahine-tech/chrashind/internal/users"
-	"github.com/Chahine-tech/chrashind/prisma/db"
+	"github.com/Chahine-tech/chrashind/utils/services/prisma"
 )
 
 type Link struct {
@@ -31,7 +31,8 @@ func (link Link) Save(ctx context.Context) (int64, error) {
 
 }
 
-func GetAll(client *db.PrismaClient, ctx context.Context) ([]Link, error) {
+func GetAll(ctx context.Context) ([]Link, error) {
+	client := prisma.PrismaClient()
 	links, err := client.Links.FindMany().Exec(ctx)
 	if err != nil {
 		return nil, err
