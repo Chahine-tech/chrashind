@@ -16,14 +16,14 @@ type User struct {
 	Password string `json:"password"`
 }
 
-func (user *User) Create(ctx context.Context) {
+func (user *User) Create(ctx context.Context) error {
 	client := prisma.PrismaClient()
 	createdUser, err := client.Users.CreateOne(
 		db.Users.Username.Set(user.Username),
 		db.Users.Password.Set(user.Password),
 	).Exec(ctx)
 	if err != nil {
-		return
+		return err
 	}
 	hashedPassword, err := bcrypt.HashPassword(user.Password)
 	if err != nil {
@@ -37,41 +37,40 @@ func (user *User) Create(ctx context.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return nil
 }
 
 func GetUserIdByUsername(username string, ctx context.Context) (int, error) {
 	client := prisma.PrismaClient()
 	user, err := client.Users.FindUnique(db.Users.ID.Equals(username)).Exec(ctx)
 	if err != nil {
-		// Handle the error appropriately
 		return 0, err
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
-		// Handle the conversion error appropriately
 		return 0, err
 	}
 
 	return userID, nil
 }
 
-// func (user *User) Authenticate() bool {
-// 	statement, err := database.Db.Prepare("select Password from Users WHERE Username = ?")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	row := statement.QueryRow(user.Username)
+func (user *User) Authenticate(ctx context.Context) bool {
+	client := prisma.PrismaClient()
+	foundUser, err := client.Users.FindFirst(db.Users.Username.Equals(user.Username)).Exec(ctx)
+	if err != nil {
+		// Handle the error appropriately, log or return false
 
-// 	var hashedPassword string
-// 	err = row.Scan(&hashedPassword)
-// 	if err != nil {
-// 		if err == sql.ErrNoRows {
-// 			return false
-// 		} else {
-// 			log.Fatal(err)
-// 		}
-// 	}
+		return false
+	}
 
-// 	return bcrypt.CheckPasswordHash(user.Password, hashedPassword)
-// }
+	// If no user is found, return false
+	if foundUser == nil {
+		return false
+	}
+
+	// Compare the hashed password with the provided password
+	isPasswordMatch := bcrypt.CheckPasswordHash(user.Password, foundUser.Password)
+
+	return isPasswordMatch
+}
