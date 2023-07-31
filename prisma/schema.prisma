@@ -17,6 +17,7 @@ model Users {
   updatedAt DateTime @updatedAt
   username  String   @unique
   password  String
+  links     Links[]
 }
 
 model Links {
@@ -25,5 +26,6 @@ model Links {
   updatedAt DateTime @updatedAt
   title     String
   address   String
-  userId    String
+  userId    String   // Add a scalar field to store the user's ID
+  user      Users    @relation(fields: [userId], references: [id])
 }

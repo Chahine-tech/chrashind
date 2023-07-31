@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  build:
+    build:
+      context: . # Use the correct path to your project if it's not in the parent directory.
+      dockerfile: Dockerfile # Use the correct path to your Dockerfile if it's not in the parent directory.
+    restart: always
+    container_name: chrashind  # Replace 'your_container_name' with an appropriate name for your container.
+    ports:
+      - 8080:8080  # Map port 8080 from the container to port 8080 on the host machine.
+    depends_on: 
+      - database
+    environment:  # Set the environment variable for the database connection
+      DATABASE_URL: postgresql://admin:admin@database:5432/database  # Use the service name 'database' as the hostname
+  database:
+    container_name: chrashind-db
+    hostname: chrasshind
+    image: postgres:14.2
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: database

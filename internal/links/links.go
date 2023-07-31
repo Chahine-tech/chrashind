@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/Chahine-tech/chrashind/internal/users"
+	"github.com/Chahine-tech/chrashind/prisma/db"
 	"github.com/Chahine-tech/chrashind/utils/services/prisma"
 )
 
@@ -17,18 +19,23 @@ type Link struct {
 }
 
 func (link Link) Save(ctx context.Context) (int64, error) {
-	// client := prisma.PrismaClient()
-	// createdLink, err := client.Links.CreateOne(
-	// 	db.Links.Title.Set(link.Title),
-	// 	db.Links.Address.Set(link.Address),
-	// ).Exec(ctx)
-	// if err != nil {
-	// 	return 0, err
-	// }
-	// return createdLink.ID, nil
-
-	return 0, nil
-
+	client := prisma.PrismaClient()
+	createdLink, err := client.Links.CreateOne(
+		db.Links.Title.Set(link.Title),
+		db.Links.Address.Set(link.Address),
+		db.Links.User.Link(
+			db.Users.ID.Equals(ctx.Value("userID").(string)),
+		),
+		db.Links.ID.Set("user"),
+	).Exec(ctx)
+	if err != nil {
+		return 0, err
+	}
+	linkID, err := strconv.ParseInt(createdLink.ID, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return linkID, nil
 }
 
 func GetAll(ctx context.Context) ([]Link, error) {

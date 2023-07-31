@@ -8,6 +8,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/Chahine-tech/chrashind/graph"
+	"github.com/Chahine-tech/chrashind/internal/auth"
+	"github.com/go-chi/chi"
 )
 
 const defaultPort = "8080"
@@ -17,7 +19,11 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
-	// http.use(middleware)
+
+	r := chi.NewRouter()
+
+	r.Use(auth.Middleware())
+
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))

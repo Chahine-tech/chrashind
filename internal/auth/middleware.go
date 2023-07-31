@@ -15,7 +15,8 @@ type contextKey struct {
 	name string
 }
 
-func Middleware(ctx context.Context) func(http.Handler) http.Handler {
+func Middleware() func(http.Handler) http.Handler {
+	ctx := context.Background()
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")
