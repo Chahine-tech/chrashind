@@ -74,3 +74,12 @@ func (user *User) Authenticate(ctx context.Context) bool {
 
 	return isPasswordMatch
 }
+
+type userCtxKeyType int
+
+const userCtxKey userCtxKeyType = 0
+
+func ForContext(ctx context.Context) *User {
+	raw, _ := ctx.Value(userCtxKey).(*User)
+	return raw
+}
